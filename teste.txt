@@ -1,0 +1,5 @@
+AA = 10
+var = 1
+var_2 = var + 3.45
+_var = var_2 + 30
+resultado_final = _var 
