@@ -1,5 +1,15 @@
-AA = 10
-var = 1
-var_2 = var + 3.45
-_var = var_2 + 30
-resultado_final = _var 
+a == 1
+var1 = 2
+var_aux = 3
+_variavel = 4
+//comentario
+
+var1 < var_aux
+
+_variavel > var_aux
+
+1 + 2
+1.5 + 4.5
+
+1 + (2*3)/ 2
+

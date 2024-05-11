@@ -15,6 +15,20 @@ void error(char msg[], int linha) {
     exit(1);
 }
 
+bool ocorrencia_tab_enter(char c){
+    return c == ' ' || c == '\t';
+}
+
+bool ocorrencia_letra(char c){
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+bool ocorrencia_digito(char c){
+    return c >= '0' && c <= '9';
+}
+bool ocorrencia_underline(char c){
+    return c == '_';
+}
+
 TOKEN Analex(FILE *fd) {
     int estado = 0;
     int tamL = 0;
@@ -28,17 +42,17 @@ TOKEN Analex(FILE *fd) {
         c = fgetc(fd);
         switch (estado) {
         case 0:
-            if (c == ' ' || c == '\t') {
+            if (ocorrencia_tab_enter(c)) {
                 estado = 0;
-            } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            } else if (ocorrencia_letra(c)) {
                 estado = 3;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
-            } else if (c == '_') {
+            } else if (ocorrencia_underline(c)) {
                 estado = 1;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
-            } else if (c >= '0' && c <= '9') {
+            } else if (ocorrencia_digito(c)) {
                 estado = 4;
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
@@ -57,7 +71,7 @@ TOKEN Analex(FILE *fd) {
                 t.cat = SINAL;
                 t.codigo = MULTIPLICACAO;
                 return t;
-            } else if (c == '/') {
+            } else if (c == '/') { //comentário
                 c = fgetc(fd);
                 if (c == '/') {
                     while (c != '\n') {
@@ -255,16 +269,15 @@ int main(){
     FILE *fd;
     TOKEN tk;
 
-    fd = fopen("teste.txt","r");
+    fd = fopen("C:/Users/guilh/OneDrive/Documentos/ANALEX/teste.txt","r");
     
 
-    while (1)
-    {
+    while (1){
         tk = Analex(fd);
-        printf("Linha: %d", contLinha);
+        printf("Linha: %d  ", contLinha);
         switch (tk.cat) {
             case ID: 
-                printf("ID: %s\n\n", tk.lexema);
+                printf("ID: %s\n\n ", tk.lexema);
                 break;
             case COMENTARIO: printf("COMENTÁRIOS\n\n");
                 break;
@@ -322,8 +335,7 @@ int main(){
             case REALCON: printf("REALCON: %0.2f\n\n", tk.valor_double);
                 break;
             case FIM_EXPR: 
-                printf("FINAL DA EXPRESSAO,%d\n", 0);
-                printf("LINHA: %d ", contLinha);
+                printf("FINAL DA EXPRESSAO\n");
                 break;
             case FIM_ARQ:
                 printf("FIM DO ARQUIVO\n");
