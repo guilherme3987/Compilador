@@ -50,16 +50,16 @@ TOKEN Analex(FILE *fd) {
                 estado = 0;
             } else if (ocorrencia_letra(c)) {
                 estado = 3;
-                lexema[tamL++] = c;
-                lexema[tamL] = '\0';
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
             } else if (ocorrencia_underline(c)) {
                 estado = 1;
-                lexema[tamL++] = c;
-                lexema[tamL] = '\0';
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
             } else if (ocorrencia_digito(c)) {
                 estado = 4;
-                digitos[tamD++] = c;
-                digitos[tamD] = '\0';
+                digitos[tamD] = c;
+                digitos[++tamD] = '\0';
             } else if (c == '+') {
                 estado = 22;
                 t.cat = SINAL;
@@ -224,8 +224,8 @@ TOKEN Analex(FILE *fd) {
         case 1:
             if (ocorrencia_letra(c)) {
                 estado = 3;
-                lexema[tamL++] = c;
-                lexema[tamL] = '\0';
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
             } else {
                 estado = 0;
                 ungetc(c, fd);
@@ -234,27 +234,26 @@ TOKEN Analex(FILE *fd) {
                     strcpy(t.lexema, lexema);
                     return t;
                 } else {
-                    printf("ID invalido");
-
+                    printf("ID invalido\n");
+                    exit(1);
                 }
             }
             break;
 
-
         case 3:
             if (ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c)) {
                 estado = 3;
-                lexema[tamL++] = c;
-                lexema[tamL] = '\0';
-                
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
             } else {
-                if(!(ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c))){
-                    printf("Id invalido na linha %d\n", contLinha);
-                    
-                }
                 estado = 0;
                 ungetc(c, fd);
-                t.cat = ID;
+                // Verificar se é uma palavra reservada
+                if (strcmp(lexema, "const") == 0) {
+                    t.cat = IDCONST;
+                } else {
+                    t.cat = ID;
+                }
                 strcpy(t.lexema, lexema);
                 return t;
             }
@@ -263,12 +262,12 @@ TOKEN Analex(FILE *fd) {
         case 4:
             if (ocorrencia_digito(c)) {
                 estado = 4;
-                digitos[tamD++] = c;
-                digitos[tamD] = '\0';
+                digitos[tamD] = c;
+                digitos[++tamD] = '\0';
             } else if (c == '.') {
                 estado = 8;
-                digitos[tamD++] = c;
-                digitos[tamD] = '\0';
+                digitos[tamD] = c;
+                digitos[++tamD] = '\0';
             } else {
                 estado = 6;
                 ungetc(c, fd);
@@ -278,11 +277,12 @@ TOKEN Analex(FILE *fd) {
             }
             break;
 
+
         case 8:
             if (ocorrencia_digito(c)) {
                 estado = 8;
-                digitos[tamD++] = c;
-                digitos[tamD] = '\0';
+                digitos[tamD] = c;
+                digitos[++tamD] = '\0';
             } else {
                 estado = 8;
                 ungetc(c, fd);
@@ -291,6 +291,29 @@ TOKEN Analex(FILE *fd) {
                 return t;
             }
             break;
+        case 52: // Estado para reconhecer charcon
+            if (isprint(c) && c != '\'' && c != '\\') {
+                estado = 55;
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
+            } else {
+                printf("ERRO na linha: %d\n", contLinha);
+                exit(1);
+            }
+            break;
+
+    case 55:
+        if (c == '\'') {
+            estado = 0;
+            t.cat = CHARCON;
+            strcpy(t.lexema, lexema);
+            return t;
+        } else {
+            printf("ERRO na linha: %d\n", contLinha);
+            exit(1); 
+        }
+        break;
+
         case 53: // Estado para reconhecer stringcon
             if (c == '"') {
                 estado = 0;
@@ -299,15 +322,15 @@ TOKEN Analex(FILE *fd) {
                 return t;
             } else if (isprint(c) && c != '\n' && c != '"') {
                 if (tamL < TAM_LEXEMA - 1) {
-                    lexema[tamL++] = c;
-                    lexema[tamL] = '\0';
+                lexema[tamL] = c;  
+                lexema[++tamL] = '\0'; 
                 } 
             } else {
                 printf("ERRO na linha: %d\n", contLinha);
                 exit(1);
+                
             }
             break;
-
         }
     }
 }
@@ -331,6 +354,8 @@ int main(){
             case STRINGCON: printf("STRINGCON:%s\n\n",tk.lexema);
                 break;
             case CHARCON:printf("CHARCON: %s\n\n ",tk.lexema);
+                break;
+            case IDCONST: printf("CONSTANTE: %s\n\n", tk.lexema);
                 break;
             case SINAL:
                 switch (tk.codigo){
@@ -377,8 +402,6 @@ int main(){
                     case ENDERECO: printf("ENDERECAMENTO\n\n");
                         break;
                     case OR: printf("OR\n\n");
-                        break;
-                    default:
                         break;
                 }
                 break;
