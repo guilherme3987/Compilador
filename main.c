@@ -33,7 +33,7 @@ TOKEN Analex(FILE *fd) {
     int estado = 0;
     int tamL = 0;
     int tamD = 0;
-    char lexema[TAM_MAX_LEXEMA] = "";
+    char lexema[TAM_LEXEMA] = "";
     char digitos[TAM_NUM] = "";
     char c;
     TOKEN t;
@@ -183,6 +183,26 @@ TOKEN Analex(FILE *fd) {
                     t.codigo = ENDERECO;
                     return t;
                 }
+            } else if(c == '|'){
+                estado = 50;
+                c = fgetc(fd);
+                if( c == '|'){
+                    estado = 51;
+                    ungetc(c, fd);
+                    t.cat = SINAL;
+                    t.codigo = OR;
+                    return t;
+                } else {
+                    estado = 0;
+                    ungetc(c, fd);
+                    t.cat = SINAL;
+                    t.codigo = PIPE; // Adicione um token para o caractere '|'
+                    return t;
+                }
+            } else if (c == '\'') { // Verifica charcon
+                estado = 52;
+            } else if (c == '"') { // Verifica stringcon
+                estado = 53;
             } else if (c == '\n') {
                 estado = 0;
                 t.cat = FIM_EXPR;
@@ -198,11 +218,11 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 1:
-            if (c == '_') {
+            if (ocorrencia_underline(c)) {
                 estado = 0;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
-            } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            } else if (ocorrencia_letra(c)) {
                 estado = 3;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
@@ -216,7 +236,7 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 3:
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
+            if (ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c)) {
                 estado = 3;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
@@ -230,7 +250,7 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 4:
-            if (c >= '0' && c <= '9') {
+            if (ocorrencia_digito(c)) {
                 estado = 4;
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
@@ -248,7 +268,7 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 8:
-            if (c >= '0' && c <= '9') {
+            if (ocorrencia_digito(c)) {
                 estado = 8;
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
@@ -260,10 +280,25 @@ TOKEN Analex(FILE *fd) {
                 return t;
             }
             break;
+        case 53: // Estado para reconhecer stringcon
+            if (c == '"') {
+                estado = 0;
+                t.cat = STRINGCON;
+                strcpy(t.lexema, lexema);
+                return t;
+            } else if (isprint(c) && c != '\n' && c != '"') {
+                if (tamL < TAM_LEXEMA - 1) {
+                    lexema[tamL++] = c;
+                    lexema[tamL] = '\0';
+                } 
+            } else {
+                printf("ERRO na linha: %d\n", contLinha);
+                exit(1);
+            }
+            break;
         }
     }
 }
-
 int main(){
 
     FILE *fd;
@@ -279,7 +314,11 @@ int main(){
             case ID: 
                 printf("ID: %s\n\n ", tk.lexema);
                 break;
-            case COMENTARIO: printf("COMENTÁRIOS\n\n");
+/*            case COMENTARIO: printf("COMENTÁRIOS\n\n%s",tk.lexema);
+                break;*/
+            case STRINGCON: printf("STRINGCON:%s\n\n",tk.lexema);
+                break;
+            case CHARCON:printf("CHARCON: %s\n\n ",tk.lexema);
                 break;
             case SINAL:
                 switch (tk.codigo){
@@ -325,7 +364,8 @@ int main(){
                         break;
                     case ENDERECO: printf("ENDERECAMENTO\n\n");
                         break;
-
+                    case OR: printf("OR\n\n");
+                        break;
                     default:
                         break;
                 }
