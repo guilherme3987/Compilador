@@ -28,6 +28,7 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 
 //teste string
 "HELLO WORLD !!!!"
-"AB,BA,AAB"
-"1 2 3 4 5.."
-"@$%@$%@$%@$%@$%@$%&*&&"
+"AB \n BA \n AAB"
+"1 2 3 4 5"
+
+//teste charcon

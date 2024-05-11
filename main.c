@@ -184,20 +184,20 @@ TOKEN Analex(FILE *fd) {
                     return t;
                 }
             } else if(c == '|'){
-                estado = 50;
-                c = fgetc(fd);
-                if( c == '|'){
-                    estado = 51;
-                    ungetc(c, fd);
-                    t.cat = SINAL;
-                    t.codigo = OR;
-                    return t;
-                } else {
-                    estado = 0;
-                    ungetc(c, fd);
-                    t.cat = SINAL;
-                    t.codigo = PIPE; // Adicione um token para o caractere '|'
-                    return t;
+            estado = 50;
+            c = fgetc(fd);
+            if( c == '|'){
+                estado = 51;
+                ungetc(c, fd);
+                t.cat = SINAL;
+                t.codigo = OR;
+                return t;
+            } else {
+                estado = 0;
+                ungetc(c, fd);
+                t.cat = SINAL;
+                t.codigo = PIPE; // Adicione um token para o caractere '|'
+                return t;
                 }
             } else if (c == '\'') { // Verifica charcon
                 estado = 52;
@@ -218,22 +218,24 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 1:
-            if (ocorrencia_underline(c)) {
-                estado = 0;
-                lexema[tamL++] = c;
-                lexema[tamL] = '\0';
-            } else if (ocorrencia_letra(c)) {
+            if (ocorrencia_letra(c)) {
                 estado = 3;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
             } else {
                 estado = 0;
                 ungetc(c, fd);
-                t.cat = ID;
-                strcpy(t.lexema, lexema);
-                return t;
+                if (tamL > 1) { // Verifica se o lexema tem mais de um caractere
+                    t.cat = ID;
+                    strcpy(t.lexema, lexema);
+                    return t;
+                } else {
+                    tamL = 0; // Reinicia o tamanho do lexema
+                    // Não retorna nenhum token, apenas continua a análise
+                }
             }
             break;
+
 
         case 3:
             if (ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c)) {
@@ -296,6 +298,7 @@ TOKEN Analex(FILE *fd) {
                 exit(1);
             }
             break;
+
         }
     }
 }
