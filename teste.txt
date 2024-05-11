@@ -33,7 +33,7 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 'a'
 
 //constantes
-const  = 100
+const inst  = 100
 
 //invalidos
 _var$

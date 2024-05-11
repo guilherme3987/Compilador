@@ -204,9 +204,9 @@ TOKEN Analex(FILE *fd) {
                 return t;
                 }
             } else if (c == '\'') { // Verifica charcon
-                estado = 52;
+                estado = 15;
             } else if (c == '"') { // Verifica stringcon
-                estado = 53;
+                estado = 11;
             } else if (c == '\n') {
                 estado = 0;
                 t.cat = FIM_EXPR;
@@ -291,9 +291,9 @@ TOKEN Analex(FILE *fd) {
                 return t;
             }
             break;
-        case 52: // Estado para reconhecer charcon
+        case 15: // Estado para reconhecer charcon
             if (isprint(c) && c != '\'' && c != '\\') {
-                estado = 55;
+                estado = 14;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
             } else {
@@ -302,19 +302,19 @@ TOKEN Analex(FILE *fd) {
             }
             break;
 
-    case 55:
-        if (c == '\'') {
-            estado = 0;
-            t.cat = CHARCON;
-            strcpy(t.lexema, lexema);
-            return t;
-        } else {
-            printf("ERRO na linha: %d\n", contLinha);
-            exit(1); 
-        }
-        break;
+        case 14:
+            if (c == '\'') {
+                estado = 0;
+                t.cat = CHARCON;
+                strcpy(t.lexema, lexema);
+                return t;
+            } else {
+                printf("ERRO na linha: %d\n", contLinha);
+                exit(1); 
+            }
+            break;
 
-        case 53: // Estado para reconhecer stringcon
+        case 11: // Estado para reconhecer stringcon
             if (c == '"') {
                 estado = 0;
                 t.cat = STRINGCON;
@@ -331,6 +331,7 @@ TOKEN Analex(FILE *fd) {
                 
             }
             break;
+
         }
     }
 }
