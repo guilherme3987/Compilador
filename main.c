@@ -255,7 +255,7 @@ int main(){
     FILE *fd;
     TOKEN tk;
 
-    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Lendo arquivo txt/teste.txt","r");
+    fd = fopen("teste.txt","r");
     
 
     while (1)
