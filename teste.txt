@@ -1,4 +1,4 @@
-//teste operadores lógicos
+// teste operadores lógicos
 a || ( b && c )
 ! VAR
 VAR != VAR3
@@ -31,4 +31,5 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 "AB \n BA \n AAB"
 "1 2 3 4 5"
 
-//teste charcon
+//casos invalidos
+A@

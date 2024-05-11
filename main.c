@@ -29,6 +29,10 @@ bool ocorrencia_underline(char c){
     return c == '_';
 }
 
+bool eh_imprimivel(char c) {
+    return c >= 32 && c <= 126; // Caracteres imprimíveis na tabela ASCII vão de 32 a 126
+}
+
 TOKEN Analex(FILE *fd) {
     int estado = 0;
     int tamL = 0;
@@ -230,8 +234,8 @@ TOKEN Analex(FILE *fd) {
                     strcpy(t.lexema, lexema);
                     return t;
                 } else {
-                    tamL = 0; // Reinicia o tamanho do lexema
-                    // Não retorna nenhum token, apenas continua a análise
+                    printf("ID invalido");
+
                 }
             }
             break;
@@ -242,7 +246,12 @@ TOKEN Analex(FILE *fd) {
                 estado = 3;
                 lexema[tamL++] = c;
                 lexema[tamL] = '\0';
+                
             } else {
+                if(!(ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c))){
+                    printf("Id invalido na linha %d\n", contLinha);
+                    
+                }
                 estado = 0;
                 ungetc(c, fd);
                 t.cat = ID;
