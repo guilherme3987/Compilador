@@ -286,21 +286,39 @@ TOKEN Analex(FILE *fd) {
             } else {
                 estado = 6;
                 ungetc(c, fd);
+                // Verifica se o número inteiro tem formato correto
+                if (digitos[0] == '0' && digitos[1] != '.') {
+                    error("ERRO: Número inteiro mal formado na linha: ", contLinha);
+                    exit(1);
+                }
                 t.cat = INTCON;
                 t.valor_int = atoi(digitos);
                 return t;
             }
             break;
 
-
         case 8:
             if (ocorrencia_digito(c)) {
+                estado = 8;
+                digitos[tamD] = c;
+                digitos[++tamD] = '\0';
+            } else if (c == '.') {
+                // Verifica se já houve um ponto decimal
+                if (strchr(digitos, '.') != NULL) {
+                    error("ERRO: Número real mal formado na linha: ", contLinha);
+                    exit(1);
+                }
                 estado = 8;
                 digitos[tamD] = c;
                 digitos[++tamD] = '\0';
             } else {
                 estado = 8;
                 ungetc(c, fd);
+                // Verifica se o número real tem formato correto
+                if (digitos[tamD - 1] == '.' || digitos[0] == '.') {
+                    error("ERRO: Número real mal formado na linha: ", contLinha);
+                    exit(1);
+                }
                 t.cat = REALCON;
                 t.valor_double = atof(digitos);
                 return t;
