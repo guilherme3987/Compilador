@@ -204,7 +204,7 @@ TOKEN Analex(FILE *fd) {
                 return t;
                 }
             } else if (c == '\'') { // Verifica charcon
-                estado = 15;
+                estado = 12;
             } else if (c == '"') { // Verifica stringcon
                 estado = 11;
             } else if (c == '\n') {
@@ -216,7 +216,7 @@ TOKEN Analex(FILE *fd) {
                 t.cat = FIM_ARQ;
                 return t;
             } else {
-                printf("ERRO na linha: %d\n", contLinha);
+                error("ERRO na linha: ", contLinha);
                 exit(1);
             }
             break;
@@ -234,7 +234,7 @@ TOKEN Analex(FILE *fd) {
                     strcpy(t.lexema, lexema);
                     return t;
                 } else {
-                    printf("ID invalido\n");
+                    error("ERRO na linha: ", contLinha);
                     exit(1);
                 }
             }
@@ -245,15 +245,30 @@ TOKEN Analex(FILE *fd) {
                 estado = 3;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
-            } else {
+            } else if (c == ' ') {
                 estado = 0;
                 ungetc(c, fd);
                 // Verificar se é uma palavra reservada
                 if (strcmp(lexema, "const") == 0) {
-                    t.cat = IDCONST;
+                    // Verificar se o próximo token é "int"
+                    char proximo[4]; // "int\0" tem 4 caracteres
+                    fscanf(fd, "%3s", proximo); // Ler o próximo token
+                    if (strcmp(proximo, "int") == 0) {
+                        t.cat = IDCONST;
+                        strcat(lexema, " "); // Adiciona espaço para manter "const int" como uma unidade lexical
+                        strcat(lexema, proximo);
+                    } else {
+                        t.cat = ID;
+                    }
                 } else {
                     t.cat = ID;
                 }
+                strcpy(t.lexema, lexema);
+                return t;
+            } else {
+                estado = 0;
+                ungetc(c, fd);
+                t.cat = ID;
                 strcpy(t.lexema, lexema);
                 return t;
             }
@@ -291,13 +306,30 @@ TOKEN Analex(FILE *fd) {
                 return t;
             }
             break;
-        case 15: // Estado para reconhecer charcon
-            if (isprint(c) && c != '\'' && c != '\\') {
+        case 12: // Estado para reconhecer charcon
+            if (c == '\'') { // Verifica charcon
+                estado = 12;
+            } else if (c == '\\') { // Verifica se é uma barra invertida
+                estado = 15;
+            } else if (isprint(c)) { // Verifica se é um caractere imprimível
                 estado = 14;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
             } else {
-                printf("ERRO na linha: %d\n", contLinha);
+                error("ERRO na linha: ", contLinha);
+                exit(1);
+            }
+            break;
+
+        case 15: // Estado para lidar com barra invertida
+            if (c == 'n') { // Verifica se é '\n'
+                strcpy(lexema, "pular linha");
+                estado = 14;
+            } else if (c == '0') { // Verifica se é '\0'
+                strcpy(lexema, "caractere nulo");
+                estado = 14;
+            } else {
+                error("ERRO na linha: ", contLinha);
                 exit(1);
             }
             break;
@@ -309,7 +341,7 @@ TOKEN Analex(FILE *fd) {
                 strcpy(t.lexema, lexema);
                 return t;
             } else {
-                printf("ERRO na linha: %d\n", contLinha);
+                error("ERRO na linha: ", contLinha);
                 exit(1); 
             }
             break;
@@ -326,7 +358,7 @@ TOKEN Analex(FILE *fd) {
                 lexema[++tamL] = '\0'; 
                 } 
             } else {
-                printf("ERRO na linha: %d\n", contLinha);
+                error("ERRO na linha: %d\n", contLinha);
                 exit(1);
                 
             }

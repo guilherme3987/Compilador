@@ -4,8 +4,6 @@ a || ( b && c )
 VAR != VAR3
 
 //teste operadores aritmeticos
-
-
 var = 10
 variavel0 == 100
 _variavel == 450
@@ -31,9 +29,8 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 
 //teste charcon
 'a'
+'\n'
+'\0'
 
-//constantes
-const inst  = 100
-
-//invalidos
-_var$
+//constante inteira
+const int
