@@ -7,14 +7,17 @@
 
 #define TAM_LEXEMA 31
 #define TAM_NUM 20
+
+//Var global
 int contLinha = 1;
 
-
+//Rertorno de erro
 void error(char msg[], int linha) {
     printf("%s%d\n", msg, linha);
     exit(1);
 }
 
+//Função para retornar ocorrências
 bool ocorrencia_tab_enter(char c){
     return c == ' ' || c == '\t';
 }
@@ -29,10 +32,11 @@ bool ocorrencia_underline(char c){
     return c == '_';
 }
 
+// Caracteres imprimíveis na tabela ASCII 
 bool eh_imprimivel(char c) {
-    return c >= 32 && c <= 126; // Caracteres imprimíveis na tabela ASCII vão de 32 a 126
+    return c >= 32 && c <= 126; 
 }
-
+//Função Analex
 TOKEN Analex(FILE *fd) {
     int estado = 0;
     int tamL = 0;
@@ -42,83 +46,87 @@ TOKEN Analex(FILE *fd) {
     char c;
     TOKEN t;
 
+    ///Transições do AFD
     while (1) {
         c = fgetc(fd);
         switch (estado) {
-        case 0:
+        case 0:                             //Estado 0
             if (ocorrencia_tab_enter(c)) {
                 estado = 0;
-            } else if (ocorrencia_letra(c)) {
+            } else if (ocorrencia_letra(c)) {       //Estado 0 sai por letra para estado 3
                 estado = 3;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
-            } else if (ocorrencia_underline(c)) {
+            } else if (ocorrencia_underline(c)) {   //Estado 0 sai por _ para estado 1
                 estado = 1;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
-            } else if (ocorrencia_digito(c)) {
+            } else if (ocorrencia_digito(c)) {      //Estado 0 sai por digitos para estado 4
                 estado = 4;
                 digitos[tamD] = c;
                 digitos[++tamD] = '\0';
-            } else if (c == '+') {
+            } else if (c == '+') {              //Estado 0 sai por + para estado 22
                 estado = 22;
                 t.cat = SINAL;
                 t.codigo = ADICAO;
                 return t;
-            } else if (c == '-') {
+            } else if (c == '-') {              //Estado 0 sai por - para estado 23
                 estado = 23;
                 t.cat = SINAL;
                 t.codigo = SUBTRACAO;
                 return t;
-            } else if (c == '*') {
+            } else if (c == '*') {              //Estado 0 sai por * para estado 24
                 estado = 24;
                 t.cat = SINAL;
                 t.codigo = MULTIPLICACAO;
                 return t;
-            } else if (c == '/') { //comentário
+            } else if (c == '/') {          //Comentários ou Divisão (estado 18) 
                 c = fgetc(fd);
-                if (c == '/') {
-                    while (c != '\n') {
+                if (c == '/') {             
+                    while (c != '\n' && c != EOF) {         
                         c = fgetc(fd);
                     }
                     estado = 0;
+                    if (c == '\n') {
+                        ungetc(c, fd);
+                    }
                     return t;
-                } else {
+                } else {                
                     estado = 18;
                     t.cat = SINAL;
                     t.codigo = DIVISAO;
                     return t;
                 }
-            } else if (c == '=') {
+            } else if (c == '=') {          //Estado 0 sai por == para estado 27 
                 c = fgetc(fd);
                 if (c == '=') {
                     estado = 27;
                     t.cat = SINAL;
-                    t.codigo = IGUALDADE;
+                    t.codigo = IGUALDADE;       
                     return t;
-                } else {
-                    estado = 26;
+                } else {                    
+                    estado = 26;        //Estado 0 sai por = para estado 26
                     ungetc(c, fd);
                     t.cat = SINAL;
                     t.codigo = ATRIBUICAO;
                     return t;
                 }
-            } else if (c == '(') {
+            } else if (c == '(') {      //Estado 0 sai por ( para esatdo 35
                 estado = 35;
                 t.cat = SINAL;
                 t.codigo = ABRE_PAR;
                 return t;
-            } else if (c == ')') {
+            } else if (c == ')') {      //Estado 0 sai por ) para estado 36
                 estado = 36;
                 t.cat = SINAL;
                 t.codigo = FECHA_PAR;
                 return t;
-            } else if (c == '{') {
+            } else if (c == '{'){       //Estado 0 sai por { para estado 37
                 estado = 37;
                 t.cat = SINAL;
                 t.codigo = ABRE_CHAVE;
                 return t;
-            } else if (c == '}') {
+            } else if (c == '}') {      //Estado 0 sai por  } para estado 38 
                 estado = 38;
                 t.cat = SINAL;
                 t.codigo = FECHA_CHAVE;
@@ -188,20 +196,20 @@ TOKEN Analex(FILE *fd) {
                     return t;
                 }
             } else if(c == '|'){
-            estado = 50;
-            c = fgetc(fd);
-            if( c == '|'){
-                estado = 51;
-                ungetc(c, fd);
-                t.cat = SINAL;
-                t.codigo = OR;
-                return t;
-            } else {
-                estado = 0;
-                ungetc(c, fd);
-                t.cat = SINAL;
-                t.codigo = PIPE; // Adicione um token para o caractere '|'
-                return t;
+                estado = 50;
+                c = fgetc(fd);
+                if( c == '|'){
+                    estado = 51;
+                    ungetc(c, fd);
+                    t.cat = SINAL;
+                    t.codigo = OR;
+                    return t;
+                } else {
+                    estado = 0;
+                    ungetc(c, fd);
+                    t.cat = SINAL;
+                    t.codigo = PIPE; //  um token para o caractere '|'
+                    return t;
                 }
             } else if (c == '\'') { // Verifica charcon
                 estado = 12;
@@ -241,39 +249,18 @@ TOKEN Analex(FILE *fd) {
             break;
 
         case 3:
-            if (ocorrencia_letra(c) || ocorrencia_digito(c) || ocorrencia_underline(c)) {
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
                 estado = 3;
-                lexema[tamL] = c;  
-                lexema[++tamL] = '\0'; 
-            } else if (c == ' ') {
-                estado = 0;
-                ungetc(c, fd);
-                // Verificar se é uma palavra reservada
-                if (strcmp(lexema, "const") == 0) {
-                    // Verificar se o próximo token é "int"
-                    char proximo[4]; // "int\0" tem 4 caracteres
-                    fscanf(fd, "%3s", proximo); // Ler o próximo token
-                    if (strcmp(proximo, "int") == 0) {
-                        t.cat = IDCONST;
-                        strcat(lexema, " "); // Adiciona espaço para manter "const int" como uma unidade lexical
-                        strcat(lexema, proximo);
-                    } else {
-                        t.cat = ID;
-                    }
-                } else {
-                    t.cat = ID;
-                }
-                strcpy(t.lexema, lexema);
-                return t;
+                lexema[tamL] = c;
+                lexema[++tamL] = '\0';
             } else {
-                estado = 0;
+                estado = 3;
                 ungetc(c, fd);
                 t.cat = ID;
                 strcpy(t.lexema, lexema);
                 return t;
             }
             break;
-
         case 4:
             if (ocorrencia_digito(c)) {
                 estado = 4;
@@ -288,7 +275,7 @@ TOKEN Analex(FILE *fd) {
                 ungetc(c, fd);
                 // Verifica se o número inteiro tem formato correto
                 if (digitos[0] == '0' && digitos[1] != '.') {
-                    error("ERRO: Número inteiro mal formado na linha: ", contLinha);
+                    error("ERRO na linha:  ", contLinha);
                     exit(1);
                 }
                 t.cat = INTCON;
@@ -305,7 +292,7 @@ TOKEN Analex(FILE *fd) {
             } else if (c == '.') {
                 // Verifica se já houve um ponto decimal
                 if (strchr(digitos, '.') != NULL) {
-                    error("ERRO: Número real mal formado na linha: ", contLinha);
+                    error("ERRO na linha", contLinha);
                     exit(1);
                 }
                 estado = 8;
@@ -316,7 +303,7 @@ TOKEN Analex(FILE *fd) {
                 ungetc(c, fd);
                 // Verifica se o número real tem formato correto
                 if (digitos[tamD - 1] == '.' || digitos[0] == '.') {
-                    error("ERRO: Número real mal formado na linha: ", contLinha);
+                    error("ERRO na linha: ", contLinha);
                     exit(1);
                 }
                 t.cat = REALCON;
@@ -366,25 +353,47 @@ TOKEN Analex(FILE *fd) {
 
         case 11: // Estado para reconhecer stringcon
             if (c == '"') {
+                if (tamL == 0) { // Se não houver caracteres entre as aspas
+                    error("ERRO na linha: ", contLinha);
+                    exit(1);
+                }
                 estado = 0;
                 t.cat = STRINGCON;
                 strcpy(t.lexema, lexema);
                 return t;
-            } else if (isprint(c) && c != '\n' && c != '"') {
+            } else if (c == '\n') { // Se encontrar uma quebra de linha antes do fechamento das aspas
+                error("ERRO na linha: ", contLinha);
+                exit(1);
+            } else if (c == '\\') { // Se encontrar uma barra invertida
+                estado = 16;
+            } else if (isprint(c)) { // Verifica se é um caractere imprimível
                 if (tamL < TAM_LEXEMA - 1) {
-                lexema[tamL] = c;  
-                lexema[++tamL] = '\0'; 
+                    lexema[tamL] = c;  
+                    lexema[++tamL] = '\0'; 
                 } 
             } else {
-                error("ERRO na linha: %d\n", contLinha);
+                error("ERRO na linha: ", contLinha);
                 exit(1);
-                
+            }
+            break;
+
+        case 16: // Estado para lidar com barra invertida dentro de uma string
+            if (c == 'n') { // Verifica se é '\n'
+                strcpy(lexema, "pular linha");
+                estado = 11; // Volta para o estado de leitura da string
+            } else if (c == '0') { // Verifica se é '\0'
+                strcpy(lexema, "caractere nulo");
+                estado = 11; // Volta para o estado de leitura da string
+            } else {
+                error("ERRO na linha: ", contLinha);
+                exit(1);
             }
             break;
 
         }
     }
 }
+
 int main(){
 
     FILE *fd;
@@ -406,7 +415,7 @@ int main(){
                 break;
             case CHARCON:printf("CHARCON: %s\n\n ",tk.lexema);
                 break;
-            case IDCONST: printf("CONSTANTE: %s\n\n", tk.lexema);
+            case PAL_RESERV: printf("PVR: %s\n\n", tk.lexema);
                 break;
             case SINAL:
                 switch (tk.codigo){

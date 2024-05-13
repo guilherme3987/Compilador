@@ -1,3 +1,4 @@
+
 // teste operadores lógicos
 a || ( b && c )
 ! VAR
@@ -21,8 +22,8 @@ var4 == _variavel
 
 VAR >= VAR1
 VAR <= VAR3
-
 var_aux = ( ( var + var_aux ) * 3.45) / 4
+
 
 //teste string
 "HELLO WORLD !!!!"
@@ -34,3 +35,4 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 
 //constante inteira
 const int
+
