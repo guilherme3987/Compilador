@@ -268,7 +268,7 @@ if (strcmp(lexema, "const") == 0) {
                     if (strcmp(proxima, "int") == 0) {
                         t.cat = IDCONST;
                         strcat(lexema, " "); // Adiciona espaço para manter "const int"
-                        strcpy(lexema, proxima);
+                        strcpy(t.lexema, proxima);
                     }
                 }else{
                     // Verifica se o lexema é uma palavra reservada
