@@ -195,21 +195,16 @@ TOKEN Analex(FILE *fd) {
                     t.codigo = ENDERECO;
                     return t;
                 }
-            } else if(c == '|'){
-                estado = 50;
+            } else if (c == '|') {
                 c = fgetc(fd);
-                if( c == '|'){
+                if (c == '|') {
                     estado = 51;
-                    ungetc(c, fd);
                     t.cat = SINAL;
                     t.codigo = OR;
                     return t;
                 } else {
-                    estado = 0;
-                    ungetc(c, fd);
-                    t.cat = SINAL;
-                    t.codigo = PIPE; //  um token para o caractere '|'
-                    return t;
+                    error("ERRO na linha: ", contLinha);
+                    exit(1);
                 }
             } else if (c == '\'') { // Verifica charcon
                 estado = 12;
@@ -247,7 +242,18 @@ TOKEN Analex(FILE *fd) {
                 }
             }
             break;
-
+/*
+if (strcmp(lexema, "const") == 0) {
+    // Verificar se o próximo token é "int"
+    char proximo[4]; // "int\0" tem 4 caracteres
+    fscanf(fd, "%3s", proximo); // Ler o próximo token
+    if (strcmp(proximo, "int") == 0) {
+        t.cat = IDCONST;
+        strcat(lexema, " "); // Adiciona espaço para manter "const int" como uma unidade lexical
+        strcat(lexema, proximo);
+    }
+}
+*/
         case 3:
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
                 estado = 3;
@@ -256,91 +262,102 @@ TOKEN Analex(FILE *fd) {
             } else {
                 estado = 3;
                 ungetc(c, fd);
-
-                // Verifica se o lexema é uma palavra reservada
-               if (strcmp("MAIN", lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo = MAIN;
-                } else if (strcmp( "DOWNTO", lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = DOWNTO;
-                } else if (strcmp("WHILE",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = WHILE;
-                } else if (strcmp( "FOR",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = FOR;
-                } else if (strcmp("IF",lexema) == 0) {
-                    t.codigo  = IF;
-                } else if (strcmp("ELSEIF",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = ELSEIF;
-                } else if (strcmp("ELSE",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = ELSE;
-                } else if (strcmp("ENDIF",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = ENDIF;
-                } else if (strcmp("GOBACK",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = GOBACK;
-                } else if (strcmp("GETINT",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = GETINT;
-                } else if (strcmp("GETCHAR",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = GETCHAR;
-                } else if (strcmp("PUTINT",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = PUTINT;
-                } else if (strcmp("PUTREAL",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = PUTREAL;
-                } else if (strcmp("PUTCHAR",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = PUTCHAR;
-                } else if (strcmp("BLOCK",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = BLOCK;
-                } else if (strcmp("ENDBLOCK",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = ENDBLOCK;
-                } else if (strcmp("CONST",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = CONST;
-                } else if (strcmp("CHAR",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = CHAR;
-                } else if (strcmp("INT",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = INT;
-                } else if (strcmp("REAL",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = REAL;
-                } else if (strcmp("BOOL",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = BOOL;
-                } else if (strcmp("WITH",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = WITH;
-                } else if (strcmp("DO",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = DO;
-                } else if (strcmp("VARYING",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = VARYING;
-                } else if (strcmp("FROM",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = FROM;
-                } else if (strcmp("TO",lexema) == 0) {
-                    t.cat = PAL_RESERV;
-                    t.codigo  = TO;
+                if (strcmp(lexema, "const") == 0) {
+                    char proxima[5]; // Aumentei o tamanho para incluir o espaço
+                    fscanf(fd, "%4s", proxima);
+                    if (strcmp(proxima, "int") == 0) {
+                        t.cat = IDCONST;
+                        strcat(lexema, " "); // Adiciona espaço para manter "const int"
+                        strcpy(lexema, proxima);
+                    }
                 }else{
-                    t.cat = ID;
-                    
+                    // Verifica se o lexema é uma palavra reservada
+                    if (strcmp("MAIN", lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo = MAIN;
+                    } else if (strcmp( "DOWNTO", lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = DOWNTO;
+                    } else if (strcmp("WHILE",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = WHILE;
+                    } else if (strcmp( "FOR",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = FOR;
+                    } else if (strcmp("IF",lexema) == 0) {
+                        t.codigo  = IF;
+                    } else if (strcmp("ELSEIF",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = ELSEIF;
+                    } else if (strcmp("ELSE",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = ELSE;
+                    } else if (strcmp("ENDIF",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = ENDIF;
+                    } else if (strcmp("GOBACK",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = GOBACK;
+                    } else if (strcmp("GETINT",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = GETINT;
+                    } else if (strcmp("GETCHAR",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = GETCHAR;
+                    } else if (strcmp("PUTINT",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = PUTINT;
+                    } else if (strcmp("PUTREAL",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = PUTREAL;
+                    } else if (strcmp("PUTCHAR",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = PUTCHAR;
+                    } else if (strcmp("BLOCK",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = BLOCK;
+                    } else if (strcmp("ENDBLOCK",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = ENDBLOCK;
+                    } else if (strcmp("CONST",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = CONST;
+                    } else if (strcmp("CHAR",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = CHAR;
+                    } else if (strcmp("INT",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = INT;
+                    } else if (strcmp("REAL",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = REAL;
+                    } else if (strcmp("BOOL",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = BOOL;
+                    } else if (strcmp("WITH",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = WITH;
+                    } else if (strcmp("DO",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = DO;
+                    } else if (strcmp("VARYING",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = VARYING;
+                    } else if (strcmp("FROM",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = FROM;
+                    } else if (strcmp("TO",lexema) == 0) {
+                        t.cat = PAL_RESERV;
+                        t.codigo  = TO;
+                    }else{
+                        t.cat = ID;
+                        
+                    }
+                    strcpy(t.lexema,lexema);
+                    return t;
                 }
-                strcpy(t.lexema,lexema);
-                return t;
+                    strcpy(t.lexema,lexema);
+                    return t;
             }
             break;
 
@@ -500,6 +517,8 @@ int main(){
                 break;
             case PAL_RESERV: printf("PVR: %s\n\n", tk.lexema);
                 break;
+            case IDCONST: printf("CONSTANTE INTEIRA: %s\n\n", tk.lexema);
+                break;
             case SINAL:
                 switch (tk.codigo){
                     case ADICAO: printf("ADICAO\n\n");
@@ -571,3 +590,4 @@ int main(){
 
     return 0;
 }
+
