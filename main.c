@@ -256,11 +256,94 @@ TOKEN Analex(FILE *fd) {
             } else {
                 estado = 3;
                 ungetc(c, fd);
-                t.cat = ID;
-                strcpy(t.lexema, lexema);
+
+                // Verifica se o lexema é uma palavra reservada
+               if (strcmp("MAIN", lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo = MAIN;
+                } else if (strcmp( "DOWNTO", lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = DOWNTO;
+                } else if (strcmp("WHILE",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = WHILE;
+                } else if (strcmp( "FOR",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = FOR;
+                } else if (strcmp("IF",lexema) == 0) {
+                    t.codigo  = IF;
+                } else if (strcmp("ELSEIF",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = ELSEIF;
+                } else if (strcmp("ELSE",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = ELSE;
+                } else if (strcmp("ENDIF",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = ENDIF;
+                } else if (strcmp("GOBACK",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = GOBACK;
+                } else if (strcmp("GETINT",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = GETINT;
+                } else if (strcmp("GETCHAR",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = GETCHAR;
+                } else if (strcmp("PUTINT",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = PUTINT;
+                } else if (strcmp("PUTREAL",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = PUTREAL;
+                } else if (strcmp("PUTCHAR",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = PUTCHAR;
+                } else if (strcmp("BLOCK",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = BLOCK;
+                } else if (strcmp("ENDBLOCK",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = ENDBLOCK;
+                } else if (strcmp("CONST",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = CONST;
+                } else if (strcmp("CHAR",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = CHAR;
+                } else if (strcmp("INT",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = INT;
+                } else if (strcmp("REAL",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = REAL;
+                } else if (strcmp("BOOL",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = BOOL;
+                } else if (strcmp("WITH",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = WITH;
+                } else if (strcmp("DO",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = DO;
+                } else if (strcmp("VARYING",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = VARYING;
+                } else if (strcmp("FROM",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = FROM;
+                } else if (strcmp("TO",lexema) == 0) {
+                    t.cat = PAL_RESERV;
+                    t.codigo  = TO;
+                }else{
+                    t.cat = ID;
+                    
+                }
+                strcpy(t.lexema,lexema);
                 return t;
             }
             break;
+
         case 4:
             if (ocorrencia_digito(c)) {
                 estado = 4;

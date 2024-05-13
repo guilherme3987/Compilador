@@ -1,8 +1,12 @@
+MAIN
 
+BLOCK
 // teste operadores lógicos
 a || ( b && c )
 ! VAR
 VAR != VAR3
+
+
 
 //teste operadores aritmeticos
 var = 10
@@ -33,6 +37,5 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 '\n'
 '\0'
 
-//constante inteira
-const int
 
+ENDBLOCK
