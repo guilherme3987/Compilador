@@ -243,6 +243,7 @@ TOKEN Analex(FILE *fd) {
             }
             break;
 /*
+Lógica para const int
 if (strcmp(lexema, "const") == 0) {
     // Verificar se o próximo token é "int"
     char proximo[4]; // "int\0" tem 4 caracteres
@@ -263,11 +264,11 @@ if (strcmp(lexema, "const") == 0) {
                 estado = 3;
                 ungetc(c, fd);
                 if (strcmp(lexema, "const") == 0) {
-                    char proxima[5]; // Aumentei o tamanho para incluir o espaço
+                    char proxima[5]; //// Adiciona espaço para manter "const int"
                     fscanf(fd, "%4s", proxima);
                     if (strcmp(proxima, "int") == 0) {
                         t.cat = IDCONST;
-                        strcat(lexema, " "); // Adiciona espaço para manter "const int"
+                        strcat(lexema, " "); 
                         strcpy(t.lexema, proxima);
                     }
                 }else{
