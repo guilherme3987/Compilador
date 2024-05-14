@@ -91,7 +91,7 @@ TOKEN Analex(FILE *fd) {
                         ungetc(c, fd);
                     }
                     return t;
-                } else {                
+                } else {            // Se não for // é / (divisão)           
                     estado = 18;
                     t.cat = SINAL;
                     t.codigo = DIVISAO;
@@ -264,7 +264,7 @@ if (strcmp(lexema, "const") == 0) {
                 estado = 3;
                 ungetc(c, fd);
                 if (strcmp(lexema, "const") == 0) {
-                    char proxima[5]; //// Adiciona espaço para manter "const int"
+                    char proxima[5]; // Adiciona espaço para manter "const int"
                     fscanf(fd, "%4s", proxima);
                     if (strcmp(proxima, "int") == 0) {
                         t.cat = IDCONST;
@@ -286,7 +286,8 @@ if (strcmp(lexema, "const") == 0) {
                         t.cat = PAL_RESERV;
                         t.codigo  = FOR;
                     } else if (strcmp("IF",lexema) == 0) {
-                        t.codigo  = IF;
+                        t.codigo  = PAL_RESERV;
+                        t.codigo = IF;
                     } else if (strcmp("ELSEIF",lexema) == 0) {
                         t.cat = PAL_RESERV;
                         t.codigo  = ELSEIF;
@@ -354,8 +355,7 @@ if (strcmp(lexema, "const") == 0) {
                         t.cat = ID;
                         
                     }
-                    strcpy(t.lexema,lexema);
-                    return t;
+
                 }
                     strcpy(t.lexema,lexema);
                     return t;
@@ -416,7 +416,8 @@ if (strcmp(lexema, "const") == 0) {
             break;
         case 12: // Estado para reconhecer charcon
             if (c == '\'') { // Verifica charcon
-                estado = 12;
+                error("Erro %d", contLinha);
+                exit(1);
             } else if (c == '\\') { // Verifica se é uma barra invertida
                 estado = 15;
             } else if (isprint(c)) { // Verifica se é um caractere imprimível
