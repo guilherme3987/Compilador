@@ -1,6 +1,4 @@
-MAIN
 
-BLOCK
 // teste operadores lógicos
 a || ( b && c )
 ! VAR
@@ -37,7 +35,10 @@ var_aux = ( ( var + var_aux ) * 3.45) / 4
 '\n'
 '\0'
 
+//const int
+const int = 100
 
+//palavras reservadas
 ENDBLOCK
 MAIN
 DOWNTO 
@@ -66,4 +67,3 @@ VARYING
 FROM
 TO
 
-const int 

@@ -53,7 +53,7 @@ TOKEN Analex(FILE *fd) {
         case 0:                             //Estado 0
             if (ocorrencia_tab_enter(c)) {
                 estado = 0;
-            } else if (ocorrencia_letra(c)) {       //Estado 0 sai por letra para estado 3
+            } else if ( ocorrencia_underline(c) || ocorrencia_letra(c) ) {       //Estado 0 sai por letra para estado 3
                 estado = 3;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
@@ -83,7 +83,7 @@ TOKEN Analex(FILE *fd) {
             } else if (c == '/') {          //Comentários ou Divisão (estado 18) 
                 c = fgetc(fd);
                 if (c == '/') {             
-                    while (c != '\n' && c != EOF) {         
+                    while (c != '\n' && c != EOF) { //Comentários são ignoradaos        
                         c = fgetc(fd);
                     }
                     estado = 0;
@@ -256,7 +256,7 @@ if (strcmp(lexema, "const") == 0) {
 }
 */
         case 3:
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
+            if (ocorrencia_underline(c) || ocorrencia_letra(c) || ocorrencia_digito(c) ) {
                 estado = 3;
                 lexema[tamL] = c;
                 lexema[++tamL] = '\0';
@@ -371,6 +371,8 @@ if (strcmp(lexema, "const") == 0) {
                 estado = 8;
                 digitos[tamD] = c;
                 digitos[++tamD] = '\0';
+            }else if( ocorrencia_underline(c)||ocorrencia_letra(c) ){
+                error("Erro na linha: %d",contLinha);
             } else {
                 estado = 6;
                 ungetc(c, fd);
@@ -454,7 +456,7 @@ if (strcmp(lexema, "const") == 0) {
 
         case 11: // Estado para reconhecer stringcon
             if (c == '"') {
-                if (tamL == 0) { // Se não houver caracteres entre as aspas
+                if (tamL == 0) { // Se não houver caracteres entre as aspas ""
                     error("ERRO na linha: ", contLinha);
                     exit(1);
                 }
