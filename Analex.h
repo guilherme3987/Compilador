@@ -34,4 +34,11 @@ typedef struct {
     };
 } TOKEN;
 
+//variaveis globais
+
+extern FILE *fd;
+extern TOKEN t;
+extern int contLinha;
+TOKEN Analex(FILE *);
+
 #endif

@@ -53,7 +53,7 @@ TOKEN Analex(FILE *fd) {
         case 0:                             //Estado 0
             if (ocorrencia_tab_enter(c)) {
                 estado = 0;
-            } else if ( ocorrencia_underline(c) || ocorrencia_letra(c) ) {       //Estado 0 sai por letra para estado 3
+            } else if ( ocorrencia_letra(c) ) {       //Estado 0 sai por letra para estado 3
                 estado = 3;
                 lexema[tamL] = c;  
                 lexema[++tamL] = '\0'; 
@@ -355,7 +355,8 @@ if (strcmp(lexema, "const") == 0) {
                         t.cat = ID;
                         
                     }
-
+                    strcpy(t.lexema,lexema);
+                    return t;
                 }
                     strcpy(t.lexema,lexema);
                     return t;
@@ -503,7 +504,7 @@ int main(){
     FILE *fd;
     TOKEN tk;
 
-    fd = fopen("C:/Users/guilh/OneDrive/Documentos/ANALEX/teste.txt","r");
+    fd = fopen("C:/Users/guilh/OneDrive/Documentos/ANALEX_ANASINT/teste.txt","r");
     
 
     while (1){
@@ -511,75 +512,75 @@ int main(){
         printf("Linha: %d  ", contLinha);
         switch (tk.cat) {
             case ID: 
-                printf("ID: %s\n\n ", tk.lexema);
+                printf("<ID><%s>\n", tk.lexema);
                 break;
 /*            case COMENTARIO: printf("COMENTÁRIOS\n\n%s",tk.lexema);
                 break;*/
-            case STRINGCON: printf("STRINGCON:%s\n\n",tk.lexema);
+            case STRINGCON: printf("<STRINGCON><%s>\n",tk.lexema);
                 break;
-            case CHARCON:printf("CHARCON: %s\n\n ",tk.lexema);
+            case CHARCON:printf("<CHARCON><%s>\n ",tk.lexema);
                 break;
-            case PAL_RESERV: printf("PVR: %s\n\n", tk.lexema);
+            case PAL_RESERV: printf("<PVR><%s>\n", tk.lexema);
                 break;
-            case IDCONST: printf("CONSTANTE INTEIRA: %s\n\n", tk.lexema);
+            case IDCONST: printf("<CONST_INT> %s\n", tk.lexema);
                 break;
             case SINAL:
                 switch (tk.codigo){
-                    case ADICAO: printf("ADICAO\n\n");
+                    case ADICAO: printf("<ADICAO>\n");
                         break;
-                    case SUBTRACAO: printf("SUBTRACAO\n\n");
+                    case SUBTRACAO: printf("<SUBTRACAO>\n");
                         break;
-                    case MULTIPLICACAO: printf("MULTIPLICACAO\n\n");
+                    case MULTIPLICACAO: printf("<MULTIPLICACAO>\n");
                         break;
-                    case DIVISAO: printf("DIVISAO\n\n");
+                    case DIVISAO: printf("<DIVISAO>\n");
                         break;
-                    case ATRIBUICAO: printf("ATRIBUICAO\n\n"); 
+                    case ATRIBUICAO: printf("<ATRIBUICAO>\n"); 
                         break;
-                    case IGUALDADE: printf("IGUALDADE\n\n");
+                    case IGUALDADE: printf("<IGUALDADE>\n");
                         break;
-                    case ABRE_PAR: printf("ABRE PARENTESE\n\n");
+                    case ABRE_PAR: printf("<ABRE PARENTESE>\n");
                         break;
-                    case FECHA_PAR: printf("FECHA PARENTESE\n\n");
+                    case FECHA_PAR: printf("<FECHA PARENTESE>\n");
                         break;
-                    case PONTO: printf("PONTO\n\n");
+                    case PONTO: printf("<PONTO>\n");
                         break;
-                    case ABRE_CHAVE: printf("ABRE CHAVE\n\n");
+                    case ABRE_CHAVE: printf("<ABRE CHAVE>\n");
                         break;
-                    case FECHA_CHAVE: printf("FECHA CHAVE\n\n");
+                    case FECHA_CHAVE: printf("<FECHA CHAVE>\n");
                         break;
-                    case ABRE_COLCHETE: printf("ABRE COLCHETE\n\n");
+                    case ABRE_COLCHETE: printf("<ABRE COLCHETE>\n");
                         break;
-                    case FECHA_COLCHETE: printf("FECHA COLCHETE\n\n");
+                    case FECHA_COLCHETE: printf("<FECHA COLCHETE>\n");
                         break;
-                    case MAIOR_QUE: printf("MAIOR QUE\n\n");
+                    case MAIOR_QUE: printf("<MAIOR QUE>\n");
                         break;
-                    case MAIOR_IGUAL: printf("MAIOR IGUAL\n\n");
+                    case MAIOR_IGUAL: printf("<MAIOR IGUAL>\n");
                         break;
-                    case MENOR_QUE: printf("MENOR QUE\n\n");
+                    case MENOR_QUE: printf("<MENOR QUE>\n");
                         break;
-                    case MENOR_IGUAL: printf("MENOR IGUAL\n\n");
+                    case MENOR_IGUAL: printf("<MENOR IGUAL>\n");
                         break;
-                    case DIFERENTE: printf("DIFERENTE\n\n");
+                    case DIFERENTE: printf("<DIFERENTE>\n");
                         break;
-                    case NEGACAO: printf("NEGACAO\n\n");
+                    case NEGACAO: printf("<NEGACAO>\n");
                         break;
-                    case AND: printf("AND\n\n");
+                    case AND: printf("<AND>\n");
                         break;
-                    case ENDERECO: printf("ENDERECAMENTO\n\n");
+                    case ENDERECO: printf("<ENDERECAMENTO>\n");
                         break;
-                    case OR: printf("OR\n\n");
+                    case OR: printf("<OR>\n");
                         break;
                 }
                 break;
-            case INTCON: printf("INTCON: %d\n\n", tk.valor_int);
+            case INTCON: printf("<INTCON><%d>\n", tk.valor_int);
                 break;
-            case REALCON: printf("REALCON: %0.2f\n\n", tk.valor_double);
+            case REALCON: printf("<REALCON>%0.2f\n", tk.valor_double);
                 break;
             case FIM_EXPR: 
-                printf("FINAL DA EXPRESSAO\n");
+                printf("<FINAL DA EXPRESSAO>\n");
                 break;
             case FIM_ARQ:
-                printf("FIM DO ARQUIVO\n");
+                printf("<FIM DO ARQUIVO>\n");
                 break;
             default:
                 break;
