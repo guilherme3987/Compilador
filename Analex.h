@@ -1,6 +1,7 @@
 #ifndef ANALEX
 #define ANALEX
-
+#include <stdbool.h>
+#include <stdio.h>
 #define TAM_MAX_LEXEMA 31
 
 // Definição das enumerações
@@ -39,6 +40,6 @@ typedef struct {
 extern FILE *fd;
 extern TOKEN t;
 extern int contLinha;
-TOKEN Analex(FILE *);
+TOKEN Analex(FILE *fd);
 
 #endif
