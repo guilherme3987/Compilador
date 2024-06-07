@@ -7,7 +7,7 @@
 // Definição das enumerações
 enum TOKEN_CAT {
     ID = 1, SINAL, INTCON, REALCON, STRINGCON, CHARCON, COMENTARIO, 
-    FIM_EXPR, FIM_ARQ,PAL_RESERV,IDCONST
+    FIM_EXPR, FIM_ARQ, PAL_RESERV, IDCONST // Adicionando PAL_RESERV e IDCONST
 };
 
 enum SINAIS {
@@ -31,11 +31,8 @@ typedef struct {
         char lexema[TAM_MAX_LEXEMA];
         int valor_int;
         double valor_double;
-
     };
 } TOKEN;
-
-//variaveis globais
 
 extern FILE *fd;
 extern TOKEN t;

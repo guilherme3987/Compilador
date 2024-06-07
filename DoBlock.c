@@ -111,9 +111,14 @@ void teste_analex(){
 void teste_ana_sint(){}
 
 int main(){
-    contLinha = 1;
+    
     printf("[=========== Análise léxica ============]\n");
     teste_analex();
+
+    
+    printf("[========== Análise sintática ==========]\n");
+    teste_ana_sint();
+
     return 0;
 
 }
