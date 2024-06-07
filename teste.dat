@@ -1,68 +1,36 @@
-// teste operadores lógicos
-a || ( b && c )
-! VAR
-VAR != VAR3
+// Programa exemplo em Do::Block - Alternativa 1 
+const int DIM_LIN = 10 
 
+const int DIM_COL = 10 
 
+block Para_Cada_Lin with int[][],int 
 
-//teste operadores aritmeticos
-var = 10
-variavel0 == 100
-_variavel == 450
-var_float = 3.45
+block Para_Cada_Col with int[][],int,int 
 
-//teste 2
-var < variavel0
-variavel0 > var
-var4 == _variavel
-1 < 2
-2 > 1
-2 >= 2
-3 <= 3
-3 != 4
+int mat[DIM_LIN][DIM_COL] 
+int i 
 
-VAR >= VAR1
-VAR <= VAR3
-var_aux = ( ( var + var_aux ) * 3.45) / 4
+do Para_Cada_Lin with mat,i  
 
+varying i from 0 to DIM_LIN-1 
 
-//teste string
-"HELLO WORLD !!!!"
+endblock 
 
-//teste charcon
-'a'
-'\n'
-'\0'
+block Para_Cada_Lin with int m[DIM_LIN][DIM_COL],int l 
 
-//const int
-const int a = 100
+int c 
 
-//palavras reservadas
-ENDBLOCK
-MAIN
-DOWNTO 
-WHILE
-FOR
-IF
-ELSEIF
-ELSE
-ENDIF
-GOBACK
-GETINT
-GETCHAR
-PUTINT
-PUTREAL
-PUTCHAR
-BLOCK
-ENDBLOCK
-CONST
-CHAR
-INT
-REAL
-BOOL
-WITH
-DO
-VARYING
-FROM
-TO
+do Para_Cada_Col with m,l,c  
 
+varying c from 0 to DIM_COL-1 
+
+endblock 
+
+block Para_Cada_Col with int m[DIM_LIN][DIM_COL],int l,int c 
+if (l >= c) m[l][c] = 1  
+
+else m[l][c] = 0 
+
+endif 
+
+endblock 
