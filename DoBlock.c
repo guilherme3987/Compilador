@@ -10,7 +10,6 @@
 TOKEN t;
 FILE *fd;
 int contLinha;
-char TAB[200] = "";
 
 
 void teste_analex(){
