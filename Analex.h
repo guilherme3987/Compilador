@@ -26,6 +26,7 @@ enum PAL_RESERV {
 // Definição da estrutura TOKEN
 typedef struct {
     enum TOKEN_CAT cat;
+    bool token_processado; //Bool para indicar se o token já foi tratado
     union {
         int codigo;
         char lexema[TAM_MAX_LEXEMA];
