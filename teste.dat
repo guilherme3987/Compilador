@@ -1,5 +1,5 @@
 // Programa exemplo em Do::Block - Alternativa 1 
-const int DIM_LIN = 10 
+const int  = 10 
 
 const int DIM_COL = 10 
 

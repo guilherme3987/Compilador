@@ -108,7 +108,31 @@ void teste_analex(){
 }
 
 
-void teste_ana_sint(){}
+void teste_ana_sint(){
+    contLinha = 0;
+    if ((fd=fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste.dat","r"))== NULL)
+    {
+        printf("Arquivo não encotrado");
+    }
+
+    while (true)
+    {
+        t = Analex(fd);
+        if (t.cat == FIM_ARQ)
+        {
+            printf("\nFim do arquivo de teste\n");
+            break;
+        }
+        if (t.cat == FIM_EXPR)
+        {
+            printf("\nLinha: %d, expressao sintaticamente correta.", contLinha );
+        }
+        
+        
+    }
+    fclose(fd);
+    
+}
 
 int main(){
     
