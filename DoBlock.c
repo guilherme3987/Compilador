@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "Analex.h"
 #include "Anasint.h"
+#include "TabSimb.h"
 
 TOKEN t;
 FILE *fd;
