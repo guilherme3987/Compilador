@@ -16,7 +16,7 @@ void teste_analex(){
 
     FILE *fd;
 
-    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste.dat","r");
+    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_analex.dat","r");
     
 
     while (1){
@@ -25,7 +25,7 @@ void teste_analex(){
         switch (t.cat) {
             case ID: 
                 printf("<ID><%s>\n", t.lexema);
-                break;
+            break;
 /*            case COMENTARIO: printf("COMENTÁRIOS\n\n%s",t.lexema);
                 break;*/
             case STRINGCON: printf("<STRINGCON><%s>\n",t.lexema);
@@ -110,7 +110,7 @@ void teste_analex(){
 
 void teste_ana_sint(){
     contLinha = 0;
-    if ((fd=fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste.dat","r"))== NULL)
+    if ((fd=fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_analex.dat","r"))== NULL)
     {
         printf("Arquivo não encotrado");
     }
@@ -122,12 +122,11 @@ void teste_ana_sint(){
         {
             printf("\nFim do arquivo de teste\n");
             break;
+        }else{
+            
+            printf("linha: %d", contLinha+1);
         }
-        if (t.cat == FIM_EXPR)
-        {
-            printf("\nLinha: %d, expressao sintaticamente correta.", contLinha );
-        }
-        
+        prog();
         
     }
     fclose(fd);

@@ -6,7 +6,6 @@
 #include "Analex.h"
 
 #define TAM_MAX_TAB 100
-#define TAM_MAX_DIM 10
 
 //Definindo estrutura de entrada da  tabela
 typedef
@@ -19,7 +18,6 @@ typedef
         char categoria[3]; //VG,FUNC,PAR
         bool zombie;
 
-        int dimensoes[2][TAM_MAX_DIM];
 
     }TabSimb;
 

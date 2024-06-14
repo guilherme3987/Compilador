@@ -1,3 +1,3 @@
-C:\MinGW\bin\gcc.exe -g c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\DoBlock.c c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\Analex.c -o c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\output\DoBlock.exe
+C:\MinGW\bin\gcc.exe -g c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\DoBlock.c c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\Analex.c c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\Anasint.c -o c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\output\DoBlock.exe
 
 c:\Users\guilh\OneDrive\Documentos\Analex_Anasint\output\DoBlock.exe

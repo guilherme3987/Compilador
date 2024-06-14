@@ -1,0 +1,69 @@
+const int DIM_LIN = 10
+
+// teste operadores lógicos
+a || ( b && c )
+! VAR
+VAR != VAR3
+
+
+
+//teste operadores aritmeticos
+var = 10
+variavel0 == 100
+_variavel == 450
+var_float = 3.45
+
+//teste 2
+var < variavel0
+variavel0 > var
+var4 == _variavel
+1 < 2
+2 > 1
+2 >= 2
+3 <= 3
+3 != 4
+
+VAR >= VAR1
+VAR <= VAR3
+var_aux = ( ( var + var_aux ) * 3.45) / 4
+
+
+//teste string
+"HELLO WORLD !!!!"
+
+//const int
+const int a = 100
+
+//palavras reservadas
+endblock
+main
+downto 
+while
+for
+if
+elseif
+else
+endif
+goback
+getint
+getchar
+putint
+putreal
+putchar
+block
+endblock
+const
+char
+int
+real
+bool
+with
+do
+varying
+from
+to
+
+//teste charcon
+'a'
+'\n'
+'\'
