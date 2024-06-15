@@ -1,12 +1,14 @@
-const DIM_LIN = 10
-const DIM_COL = 10
-
+const int DIM_LIN = 10
+const int DIM_COL = 10
 block Para_Cada_Lin with int[][],int 
 
 block Para_Cada_Col with int[][],int,int 
 
+
 int mat[DIM_LIN][DIM_COL] 
 int i 
+
+block main
 
 do Para_Cada_Lin with mat,i  
 
@@ -32,3 +34,5 @@ else m[l][c] = 0
 endif 
 
 endblock 
+
+endblock

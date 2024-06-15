@@ -40,4 +40,8 @@ extern TOKEN t;
 extern int contLinha;
 TOKEN Analex(FILE *fd);
 
+
+
+
+
 #endif

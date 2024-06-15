@@ -12,24 +12,39 @@ decl_list_var =>  id {[ intcon | idconst ]}  //IDCONST
 
 //::= {decl_list_var} {decl_block_prot}  block_main {block_def} 
 void prog() {
+    t = Analex(fd);
+
     if(!(t.cat == PAL_RESERV && t.codigo == MAIN)){
         printf("Espera-se bloco main");
     }
+    block_main();
 
-    if (t.cat == PAL_RESERV && (t.codigo == CONST 
-    | t.codigo == INT | t.codigo == REAL | t.codigo == BOOL
-    | t.codigo == CHAR))
+    if ((t.cat == PAL_RESERV) && (t.codigo == CONST) 
+    | (t.codigo == INT) | (t.codigo == REAL) | (t.codigo == BOOL)
+    | (t.codigo == CHAR))
     {
         decl_list_var();
     }
     
+    t = Analex(fd);
 
+    if(t.cat == PAL_RESERV && t.codigo ==  ID){
+        decl_block_prot();
+
+    }
+
+    if(t.cat == PAL_RESERV && t.codigo == BLOCK){
+        block_def();
+    }
+
+    if(t.cat != FIM_ARQ){
+        printf("Fim do programa");
+    }
 
 }
 
 //[const] tipo decl_var { , decl_var}
 void decl_list_var() {
-    printf("Declaração de variáveis");
 }
 
 //char | int | real  | bool
@@ -70,22 +85,65 @@ void block_def() {
 
 //atrib ::= id { [ expr ] } = expr  
 void atrib() {
- 
+    t = Analex(fd);
+
+    if (t.cat == ID) {
+        // Lógica para análise de atribuição
+        if (t.codigo == ATRIBUICAO) {
+            expr();  // Analisar expressão à direita da atribuição
+        } else {
+            printf("Erro: esperado operador de atribuição '='\n");
+        }
+    } else {
+        printf("Erro: esperado identificador para atribuição\n");
+    }
 }
 
-//expr ::= expr_simp [ op_rel  expr_simp ] 
+
+/*expr ::= expr_simp [ op_rel  expr_simp ]
+op_rel ::= IGUALDADE, DIFERENTE, MAIOR_IGUAL, 
+MENOR_IGUAL, MAIOR_QUE, MENOR_QUE
+*/
 void expr() {
- 
+    expr_simp();
+
+    t = Analex(fd);
+    if (t.cat == SINAIS && (t.codigo == IGUALDADE 
+    || t.codigo == DIFERENTE   || t.codigo == MENOR_IGUAL 
+    || t.codigo == MAIOR_IGUAL || t.codigo == MENOR_QUE 
+    || t.codigo == MAIOR_QUE)) {
+        expr_simp();  // Analisar a segunda parte da expressão
+    }
 }
+
 
 //[+ | – ] termo {(+ | – | ||) termo} 
 void expr_simp() {
- 
+    t = Analex(fd);
+    while(t.cat == SINAIS &&
+    (t.codigo == ADICAO || t.codigo == SUBTRACAO)){
+        termo();
+    }
+    t = Analex(fd);
+    while (t.cat == SINAIS &&  
+    (t.codigo == AND || t.codigo == OR)) {
+        termo();
+        t = Analex(fd);
+    }
 }
+
+
 
 //fator {(* OU / OU &&)  fator} 
 void termo() {
- 
+    fator();
+
+    t = Analex(fd);
+    while (t.cat == SINAIS && (t.codigo == MULTIPLICACAO 
+    || t.codigo == DIVISAO || t.codigo == AND)) {
+        fator();
+        t = Analex(fd);
+    }
 }
 
 /*
