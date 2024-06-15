@@ -12,18 +12,24 @@ decl_list_var =>  id {[ intcon | idconst ]}  //IDCONST
 
 //::= {decl_list_var} {decl_block_prot}  block_main {block_def} 
 void prog() {
-    t = Analex(fd);
-    if(t.cat == PAL_RESERV && (t.codigo == CONST 
-    ||t.codigo == IDCONST|| t.codigo == INT || t.codigo == CHAR ||t.codigo == REAL)){
-        printf("Foram declaradas variáveis");
-    }else{
-        printf("..");
+    if(!(t.cat == PAL_RESERV && t.codigo == MAIN)){
+        printf("Espera-se bloco main");
+    }
+
+    if (t.cat == PAL_RESERV && (t.codigo == CONST 
+    | t.codigo == INT | t.codigo == REAL | t.codigo == BOOL
+    | t.codigo == CHAR))
+    {
+        decl_list_var();
     }
     
+
+
 }
 
 //[const] tipo decl_var { , decl_var}
 void decl_list_var() {
+    printf("Declaração de variáveis");
 }
 
 //char | int | real  | bool

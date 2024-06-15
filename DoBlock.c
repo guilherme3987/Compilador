@@ -6,18 +6,21 @@
 #include "Analex.h"
 #include "Anasint.h"
 #include "TabSimb.h"
+TabIdf tabela_idf; // Definição da variável global
 
 TOKEN t;
 FILE *fd;
 int contLinha;
 
-
+//teste léxico
 void teste_analex(){
 
     FILE *fd;
 
-    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_analex.dat","r");
+    //arquivo para teste léxico fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_analex.dat","r");
     
+    //teste sintático
+    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_anasint.dat","r");
 
     while (1){
         t = Analex(fd);
@@ -107,41 +110,65 @@ void teste_analex(){
 
 }
 
-
+//teste sintático
 void teste_ana_sint(){
     contLinha = 0;
-    if ((fd=fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_analex.dat","r"))== NULL)
-    {
-        printf("Arquivo não encotrado");
-    }
+    
+    fd = fopen("C:/Users/guilh/OneDrive/Documentos/Analex_Anasint/teste_anasint.dat","r");
 
     while (true)
     {
         t = Analex(fd);
+        prog();
         if (t.cat == FIM_ARQ)
         {
             printf("\nFim do arquivo de teste\n");
             break;
         }else{
             
-            printf("linha: %d", contLinha+1);
+            printf("\nExpressão correta na linha: %d", contLinha+1);
         }
-        prog();
+        
         
     }
     fclose(fd);
     
 }
+// Implementação da função para imprimir a tabela de símbolos
+void Imprimir_tabela() {
+    printf("\n=== Tabela de Símbolos ===\n");
 
-int main(){
-    
+    if (tabela_idf.tamTab == 0) {
+        printf("A tabela de símbolos está vazia.\n");
+        return;
+    }
+
+    printf("Índice | Lexema        | Tipo | Escopo | Categoria | Zombie\n");
+    printf("------------------------------------------------------------\n");
+
+    for (int i = 0; i < tabela_idf.tamTab; i++) {
+        printf("%6d | %13s | %4d | %6d | %9s | %s\n",
+               i,
+               tabela_idf.tabela_simb[i].lexema,
+               tabela_idf.tabela_simb[i].tipo,
+               tabela_idf.tabela_simb[i].escopo,
+               tabela_idf.tabela_simb[i].categoria,
+               tabela_idf.tabela_simb[i].zombie ? "true" : "false");
+    }
+
+    printf("\nTotal de entradas na tabela: %d\n", tabela_idf.tamTab);
+}
+
+int main() {
     printf("[=========== Análise léxica ============]\n");
     teste_analex();
-
     
     printf("[========== Análise sintática ==========]\n");
     teste_ana_sint();
 
-    return 0;
+    // Após a análise sintática, imprimir a tabela de símbolos
+    Imprimir_tabela();
 
+    return 0;
 }
+
