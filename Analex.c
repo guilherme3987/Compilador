@@ -177,7 +177,7 @@ TOKEN Analex(FILE *fd) {
                     } else {
                         ungetc(c, fd);
                         t.cat = SINAL;
-                        t.codigo = ENDERECO;
+                        t.codigo = E_COMERCIAL;
                         return t;
                     }
                 } else if (c == '|') {

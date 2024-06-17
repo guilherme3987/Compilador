@@ -81,7 +81,7 @@ void teste_analex(){
                         break;
                     case AND: printf("<AND>\n");
                         break;
-                    case ENDERECO: printf("<ENDERECAMENTO>\n");
+                    case E_COMERCIAL: printf("<E_COMERCIAL>\n");
                         break;
                     case OR: printf("<OR>\n");
                         break;

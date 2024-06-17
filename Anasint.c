@@ -14,10 +14,9 @@ decl_list_var =>  id {[ intcon | idconst ]}  //IDCONST
 void prog() {
     t = Analex(fd);
 
-    if(!(t.cat == PAL_RESERV && t.codigo == MAIN)){
-        printf("Espera-se bloco main");
+    if((t.cat == PAL_RESERV && t.codigo == MAIN)){
+        block_main();
     }
-    block_main();
 
     if ((t.cat == PAL_RESERV) && (t.codigo == CONST) 
     | (t.codigo == INT) | (t.codigo == REAL) | (t.codigo == BOOL)
@@ -28,7 +27,7 @@ void prog() {
     
     t = Analex(fd);
 
-    if(t.cat == PAL_RESERV && t.codigo ==  ID){
+    if(t.cat  ==  ID){
         decl_block_prot();
 
     }
@@ -45,24 +44,118 @@ void prog() {
 
 //[const] tipo decl_var { , decl_var}
 void decl_list_var() {
+    t = Analex(fd);
+    
+    if (!(t.cat == PAL_RESERV && t.codigo == CONST))
+    {
+        tipo();
+        decl_var();
+    }
+
+
+    while (t.cat == SINAIS && t.codigo == VIRGULA)
+    {
+        decl_var();
+    }
+    
+    
+
 }
 
 //char | int | real  | bool
 void tipo() {
+    if (!(t.cat == PAL_RESERV && (t.cat == CHAR || 
+    t.cat == INT || t.cat == REAL || t.cat == BOOL)))
+    {
+        printf("Espera-se tipo");
+    }
+    
 }
 
 /*
-::= id {[ intcon | idconst ]}  //IDCONST 
+id {[ intcon | idconst ]}  //IDCONST 
 [ = (intcon | realcon | charcon | stringcon | 
 { (intcon | realcon | charcon | stringcon) {, 
 (intcon | realcon | charcon | stringcon) } } ) ] 
+
 */
 void decl_var() {
+
+    t = Analex(fd);
+
+    if (t.cat == ID)
+    {
+        if (t.cat == SINAIS && t.codigo == ABRE_COL)
+        {
+            t = Analex(fd);
+
+            if (t.cat == PAL_RESERV && 
+            (t.codigo == IDCONST || t.codigo == CONST ))
+            {
+                t = Analex(fd);
+
+                if (t.cat == PAL_RESERV && t.codigo == FECHA_COL)
+                {
+                    t = Analex(fd);
+                }else printf("Espera-se fechar coluna");
+                
+            }
+            
+        }else printf("Espera-se uma constante inteira");
+
+        if (t.cat == SINAIS && t.codigo == ATRIBUICAO) {
+            t = Analex(fd);
+
+            if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
+                t = Analex(fd);
+
+                while (t.cat == SINAIS && t.codigo == VIRGULA) {
+                    t = Analex(fd);
+
+                    if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
+                        t = Analex(fd);
+                    } else {
+                        printf("Esperava-se um valor após a vírgula  ");
+                    }
+                }
+            } else {
+                printf("Esperava-se um valor após o sinal de atribuição  ");
+            }
+        }
+    }else printf("Espera-se identificador");
+    
+    
 }
 
 //block id [with [&] tipo { [ ] } { , [&] tipo { [ ] } }] 
 void decl_block_prot() {
+    t = Analex(fd);
 
+    if(t.cat == ID && (t.cat == PAL_RESERV  && t.codigo == BLOCK)){
+
+        t = Analex(fd);
+
+        if (t.cat == PAL_RESERV && t.codigo == WITH)
+        {
+            while (true)
+            {
+                if (t.cat == SINAIS && t.codigo == E_COMERCIAL)
+                {
+                    t = Analex(fd);
+                }
+                tipo();
+
+                if (t.cat == SINAIS && t.codigo == ABRE_COL)
+                {
+                    t = Analex(fd);
+                }
+                if (t.cat == SINAIS && t.codigo == VIRGULA)
+                {
+                    t = Analex(fd);
+                }   
+            }   
+        }
+    }else printf("Espera-se block e identificadores");
 }
 
 /*
@@ -71,7 +164,21 @@ block main
 { cmd }  
 endblock */
 void block_main() {
-
+    t = Analex(fd);
+    
+    if (t.cat == PAL_RESERV && 
+    (t.codigo == BLOCK && t.codigo == MAIN))
+    {
+        decl_list_var();
+        cmd();
+    }
+    t = Analex(fd);
+    if (t.cat == PAL_RESERV && t.codigo == ENDBLOCK)
+    {
+        printf("Fim do bloco main");
+    }
+    
+        
 }
 
 /*
@@ -88,7 +195,7 @@ void atrib() {
     t = Analex(fd);
 
     if (t.cat == ID) {
-        // Lógica para análise de atribuição
+        //  análise de atribuição
         if (t.codigo == ATRIBUICAO) {
             expr();  // Analisar expressão à direita da atribuição
         } else {
@@ -157,8 +264,16 @@ void fator() {
 == ou != ou <= ou < ou >= ou >
 */
 void op_rel() {
+    t = Analex(fd);
 
-    
+    if (t.cat == SINAIS && 
+    (t.codigo == IGUALDADE  || t.codigo == DIFERENTE || 
+    t.codigo == MENOR_IGUAL || t.codigo == MENOR_QUE || 
+    t.codigo == MAIOR_IGUAL || t.codigo == MAIOR_QUE)) {
+        t = Analex(fd);
+    } else {
+        printf("Esperava-se um operador relacional ");
+    }
 }
 
 
