@@ -27,6 +27,7 @@ void termo();
 void fator();
 void op_rel();
 
+void consome(int esperado);
 
 
 #endif

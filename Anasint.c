@@ -3,6 +3,18 @@
 #include <stdio.h>
 #include "Analex.h"
 #include "Anasint.h"
+
+void consome(int esperado) {
+    if (t.codigo == esperado) {
+        t = Analex(fd); // Avança para o próximo token
+    } else {
+        printf("Erro: token inesperado. Esperava-se %d\n", esperado);
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+
 /*
 decl_list_var =>  id {[ intcon | idconst ]}  //IDCONST 
 [ = (intcon | realcon | charcon | stringcon | 
@@ -12,64 +24,48 @@ decl_list_var =>  id {[ intcon | idconst ]}  //IDCONST
 
 //::= {decl_list_var} {decl_block_prot}  block_main {block_def} 
 void prog() {
-    t = Analex(fd);
-
-    if((t.cat == PAL_RESERV && t.codigo == MAIN)){
-        block_main();
-    }
-
-    if ((t.cat == PAL_RESERV) && (t.codigo == CONST) 
-    | (t.codigo == INT) | (t.codigo == REAL) | (t.codigo == BOOL)
-    | (t.codigo == CHAR))
-    {
+   t = Analex(fd);
+    
+    while (t.cat == PAL_RESERV && (t.codigo == CONST || t.codigo == INT || t.codigo == REAL || t.codigo == BOOL || t.codigo == CHAR)) {
         decl_list_var();
     }
-    
-    t = Analex(fd);
 
-    if(t.cat  ==  ID){
+    while (t.cat == PAL_RESERV && t.codigo == BLOCK) {
         decl_block_prot();
-
     }
 
-    if(t.cat == PAL_RESERV && t.codigo == BLOCK){
+    if (t.cat == PAL_RESERV && t.codigo == MAIN) {
+        block_main();
+    } 
+
+    while (t.cat == PAL_RESERV && t.codigo == BLOCK) {
         block_def();
     }
 
-    if(t.cat != FIM_ARQ){
-        printf("Fim do programa");
-    }
 
 }
 
 //[const] tipo decl_var { , decl_var}
 void decl_list_var() {
-    t = Analex(fd);
-    
-    if (!(t.cat == PAL_RESERV && t.codigo == CONST))
-    {
-        tipo();
+     if (t.codigo == CONST) {
+        consome(CONST);
+    }
+    tipo();
+    decl_var();
+
+    while (t.codigo == VIRGULA) {
+        consome(VIRGULA);
         decl_var();
     }
-
-
-    while (t.cat == SINAIS && t.codigo == VIRGULA)
-    {
-        decl_var();
-    }
-    
-    
-
 }
 
 //char | int | real  | bool
 void tipo() {
-    if (!(t.cat == PAL_RESERV && (t.cat == CHAR || 
-    t.cat == INT || t.cat == REAL || t.cat == BOOL)))
-    {
-        printf("Espera-se tipo");
+    if (t.codigo == CHAR || t.codigo == INT || t.codigo == REAL || t.codigo == BOOL) {
+        consome(t.codigo);
+    } else {
+        printf("Erro: tipo inválido.\n");
     }
-    
 }
 
 /*
@@ -80,83 +76,74 @@ id {[ intcon | idconst ]}  //IDCONST
 
 */
 void decl_var() {
+    consome(ID);
 
-    t = Analex(fd);
-
-    if (t.cat == ID)
-    {
-        if (t.cat == SINAIS && t.codigo == ABRE_COL)
-        {
-            t = Analex(fd);
-
-            if (t.cat == PAL_RESERV && 
-            (t.codigo == IDCONST || t.codigo == CONST ))
-            {
-                t = Analex(fd);
-
-                if (t.cat == PAL_RESERV && t.codigo == FECHA_COL)
-                {
-                    t = Analex(fd);
-                }else printf("Espera-se fechar coluna");
-                
-            }
-            
-        }else printf("Espera-se uma constante inteira");
-
-        if (t.cat == SINAIS && t.codigo == ATRIBUICAO) {
-            t = Analex(fd);
-
-            if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
-                t = Analex(fd);
-
-                while (t.cat == SINAIS && t.codigo == VIRGULA) {
-                    t = Analex(fd);
-
-                    if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
-                        t = Analex(fd);
-                    } else {
-                        printf("Esperava-se um valor após a vírgula  ");
-                    }
-                }
-            } else {
-                printf("Esperava-se um valor após o sinal de atribuição  ");
-            }
+    if (t.codigo == ABRE_COL) {
+        consome(ABRE_COL);
+        if (t.cat == INTCON || t.cat == IDCONST) {
+            consome(t.cat);
         }
-    }else printf("Espera-se identificador");
-    
+        consome(FECHA_COL);
+    }
+
+    if (t.codigo == ATRIBUICAO) {
+        consome(ATRIBUICAO);
+        if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
+            consome(t.cat);
+        } else if (t.codigo == ABRE_CHAVE) {
+            consome(ABRE_CHAVE);
+            do {
+                if (t.cat == INTCON || t.cat == REALCON || t.cat == CHARCON || t.cat == STRINGCON) {
+                    consome(t.cat);
+                }
+                if (t.codigo == VIRGULA) {
+                    consome(VIRGULA);
+                } else {
+                    break;
+                }
+            } while (1);
+            consome(FECHA_CHAVE);
+        } else {
+            printf("Erro: valor esperado após '='.\n");
+        }
+    }
     
 }
 
 //block id [with [&] tipo { [ ] } { , [&] tipo { [ ] } }] 
 void decl_block_prot() {
-    t = Analex(fd);
+    consome(BLOCK);
+    consome(ID);
 
-    if(t.cat == ID && (t.cat == PAL_RESERV  && t.codigo == BLOCK)){
+    if (t.codigo == WITH) {
+        consome(WITH);
 
-        t = Analex(fd);
-
-        if (t.cat == PAL_RESERV && t.codigo == WITH)
-        {
-            while (true)
-            {
-                if (t.cat == SINAIS && t.codigo == E_COMERCIAL)
-                {
-                    t = Analex(fd);
-                }
-                tipo();
-
-                if (t.cat == SINAIS && t.codigo == ABRE_COL)
-                {
-                    t = Analex(fd);
-                }
-                if (t.cat == SINAIS && t.codigo == VIRGULA)
-                {
-                    t = Analex(fd);
-                }   
-            }   
+        if (t.codigo == E_COMERCIAL) {
+            consome(E_COMERCIAL);
         }
-    }else printf("Espera-se block e identificadores");
+        tipo();
+        consome(ID);
+
+        if (t.codigo == ABRE_COL) {
+            consome(ABRE_COL);
+            consome(FECHA_COL);
+        }
+
+        while (t.codigo == VIRGULA) {
+            consome(VIRGULA);
+            if (t.codigo == E_COMERCIAL) {
+                consome(E_COMERCIAL);
+            }
+            tipo();
+            consome(ID);
+            if (t.codigo == ABRE_COL) {
+                consome(ABRE_COL);
+                consome(FECHA_COL);
+            }
+        }
+    }
 }
+
 
 /*
 block main 
@@ -164,20 +151,17 @@ block main
 { cmd }  
 endblock */
 void block_main() {
-    t = Analex(fd);
-    
-    if (t.cat == PAL_RESERV && 
-    (t.codigo == BLOCK && t.codigo == MAIN))
-    {
+ consome(BLOCK);
+    consome(MAIN);
+
+    while (t.cat == PAL_RESERV && (t.codigo == CONST || t.codigo == INT || t.codigo == CHAR || t.codigo == REAL || t.codigo == BOOL)) {
         decl_list_var();
+    }
+
+    while (t.codigo != ENDBLOCK) {
         cmd();
     }
-    t = Analex(fd);
-    if (t.cat == PAL_RESERV && t.codigo == ENDBLOCK)
-    {
-        printf("Fim do bloco main");
-    }
-    
+    consome(ENDBLOCK);
         
 }
 
@@ -187,23 +171,56 @@ block id [with tipo id1 { [intcon1 | idconst1] }
 {decl_list_var} { cmd }  endblock 
 */
 void block_def() {
+  consome(BLOCK);
+    consome(ID);
 
+    if (t.codigo == WITH) {
+        consome(WITH);
+        tipo();
+        consome(ID);
+
+        if (t.codigo == ABRE_COL) {
+            consome(ABRE_COL);
+            if (t.cat == INTCON || t.cat == IDCONST) {
+                consome(t.cat);
+            }
+            consome(FECHA_COL);
+        }
+
+        while (t.codigo == VIRGULA) {
+            consome(VIRGULA);
+            tipo();
+            consome(ID);
+            if (t.codigo == ABRE_COL) {
+                consome(ABRE_COL);
+                if (t.cat == INTCON || t.cat == IDCONST) {
+                    consome(t.cat);
+                }
+                consome(FECHA_COL);
+            }
+        }
+    }
+
+    while (t.cat == PAL_RESERV && (t.codigo == CONST || t.codigo == INT || t.codigo == CHAR || t.codigo == REAL || t.codigo == BOOL)) {
+        decl_list_var();
+    }
+
+    while (t.codigo != ENDBLOCK) {
+        cmd();
+    }
+    consome(ENDBLOCK);
 }
 
 //atrib ::= id { [ expr ] } = expr  
 void atrib() {
-    t = Analex(fd);
-
-    if (t.cat == ID) {
-        //  análise de atribuição
-        if (t.codigo == ATRIBUICAO) {
-            expr();  // Analisar expressão à direita da atribuição
-        } else {
-            printf("Erro: esperado operador de atribuição '='\n");
-        }
-    } else {
-        printf("Erro: esperado identificador para atribuição\n");
+    consome(ID);
+    while (t.codigo == ABRE_COL) {
+        consome(ABRE_COL);
+        expr();
+        consome(FECHA_COL);
     }
+    consome(ATRIBUICAO);
+    expr();
 }
 
 
@@ -213,29 +230,23 @@ MENOR_IGUAL, MAIOR_QUE, MENOR_QUE
 */
 void expr() {
     expr_simp();
-
-    t = Analex(fd);
-    if (t.cat == SINAIS && (t.codigo == IGUALDADE 
-    || t.codigo == DIFERENTE   || t.codigo == MENOR_IGUAL 
-    || t.codigo == MAIOR_IGUAL || t.codigo == MENOR_QUE 
-    || t.codigo == MAIOR_QUE)) {
-        expr_simp();  // Analisar a segunda parte da expressão
+    if (t.codigo == IGUALDADE || t.codigo == DIFERENTE || t.codigo == MENOR_IGUAL ||
+        t.codigo == MENOR_QUE || t.codigo == MAIOR_IGUAL || t.codigo == MAIOR_QUE) {
+        op_rel();
+        expr_simp();
     }
 }
 
 
 //[+ | – ] termo {(+ | – | ||) termo} 
 void expr_simp() {
-    t = Analex(fd);
-    while(t.cat == SINAIS &&
-    (t.codigo == ADICAO || t.codigo == SUBTRACAO)){
-        termo();
+    if (t.codigo == ADICAO || t.codigo == SUBTRACAO) {
+        consome(t.codigo);
     }
-    t = Analex(fd);
-    while (t.cat == SINAIS &&  
-    (t.codigo == AND || t.codigo == OR)) {
+    termo();
+    while (t.codigo == ADICAO || t.codigo == SUBTRACAO || t.codigo == OR) {
+        consome(t.codigo);
         termo();
-        t = Analex(fd);
     }
 }
 
@@ -244,12 +255,9 @@ void expr_simp() {
 //fator {(* OU / OU &&)  fator} 
 void termo() {
     fator();
-
-    t = Analex(fd);
-    while (t.cat == SINAIS && (t.codigo == MULTIPLICACAO 
-    || t.codigo == DIVISAO || t.codigo == AND)) {
+    while (t.codigo == MULTIPLICACAO || t.codigo == DIVISAO || t.codigo == AND) {
+        consome(t.codigo);
         fator();
-        t = Analex(fd);
     }
 }
 
@@ -257,22 +265,40 @@ void termo() {
 id { [ expr ] }  | intcon | realcon | charcon |  ( expr )  | ! fator 
 */
 void fator() {
-
+    if (t.cat == ID) {
+        consome(ID);
+        while (t.codigo == ABRE_COL) {
+            consome(ABRE_COL);
+            expr();
+            consome(FECHA_COL);
+        }
+    } else if (t.cat == INTCON) {
+        consome(INTCON);
+    } else if (t.cat == REALCON) {
+        consome(REALCON);
+    } else if (t.cat == CHARCON) {
+        consome(CHARCON);
+    } else if (t.codigo == ABRE_PAR) {
+        consome(ABRE_PAR);
+        expr();
+        consome(FECHA_PAR);
+    } else if (t.codigo == DIFERENTE) {
+        consome(DIFERENTE);
+        fator();
+    } else {
+        printf("Erro: fator inválido.\n");
+    }    
 }
 
 /*
 == ou != ou <= ou < ou >= ou >
 */
 void op_rel() {
-    t = Analex(fd);
-
-    if (t.cat == SINAIS && 
-    (t.codigo == IGUALDADE  || t.codigo == DIFERENTE || 
-    t.codigo == MENOR_IGUAL || t.codigo == MENOR_QUE || 
-    t.codigo == MAIOR_IGUAL || t.codigo == MAIOR_QUE)) {
-        t = Analex(fd);
+       if (t.codigo == IGUALDADE || t.codigo == DIFERENTE || t.codigo == MENOR_IGUAL ||
+        t.codigo == MENOR_QUE || t.codigo == MAIOR_IGUAL || t.codigo == MAIOR_QUE) {
+        consome(t.codigo);
     } else {
-        printf("Esperava-se um operador relacional ");
+        printf("Erro: operador relacional esperado.\n");
     }
 }
 
@@ -288,6 +314,147 @@ while ( expr )
 | while ( expr ) { cmd } endwhile 
 | atrib   | goback  | getint id | getreal id  | getchar id  | putint id | putreal id  | putchar id       
 */
-void cmd(){
+void cmd() {
+    if (t.cat == PAL_RESERV) {
+        switch (t.codigo) {
+            case DO:
+                consome(DO);
+                if (t.cat == ID) {
+                    consome(ID);
+                    if (t.codigo == WITH) {
+                        consome(WITH);
+                        consome(ID);
+                        while (t.codigo == VIRGULA) {
+                            consome(VIRGULA);
+                            consome(ID);
+                        }
+                    }
+                    if (t.codigo == VARYING) {
+                        consome(VARYING);
+                        consome(ID);
+                        consome(FROM);
+                        expr();
+                        if (t.codigo == TO) {
+                            consome(TO);
+                        } else if (t.codigo == DOWNTO) {
+                            consome(DOWNTO);
+                        } else {
+                            printf("Erro: esperado 'to' ou 'downto'.\n");
+                        }
+                        expr();
+                    } else if (t.codigo == WHILE) {
+                        consome(WHILE);
+                        consome(ABRE_PAR);
+                        expr();
+                        consome(FECHA_PAR);
+                    } else if (t.codigo == FOR) {
+                        consome(FOR);
+                        expr();
+                    }
+                } else {
+                    cmd();
+                    if (t.codigo == VARYING) {
+                        consome(VARYING);
+                        consome(ID);
+                        consome(FROM);
+                        expr();
+                        if (t.codigo == TO) {
+                            consome(TO);
+                        } else if (t.codigo == DOWNTO) {
+                            consome(DOWNTO);
+                        } else {
+                            printf("Erro: esperado 'to' ou 'downto'.\n");
+                        }
+                        expr();
+                    } else if (t.codigo == WHILE) {
+                        consome(WHILE);
+                        consome(ABRE_PAR);
+                        expr();
+                        consome(FECHA_PAR);
+                    } else if (t.codigo == FOR) {
+                        consome(FOR);
+                        expr();
+                    }
+                }
+                break;
 
+            case IF:
+                consome(IF);
+                consome(ABRE_PAR);
+                expr();
+                consome(FECHA_PAR);
+                consome(ABRE_CHAVE);
+                cmd();
+                consome(FECHA_CHAVE);
+                while (t.codigo == ELSEIF) {
+                    consome(ELSEIF);
+                    consome(ABRE_PAR);
+                    expr();
+                    consome(FECHA_PAR);
+                    consome(ABRE_CHAVE);
+                    cmd();
+                    consome(FECHA_CHAVE);
+                }
+                if (t.codigo == ELSE) {
+                    consome(ELSE);
+                    consome(ABRE_CHAVE);
+                    cmd();
+                    consome(FECHA_CHAVE);
+                }
+                consome(ENDIF);
+                break;
+
+            case WHILE:
+                consome(WHILE);
+                consome(ABRE_PAR);
+                expr();
+                consome(FECHA_PAR);
+                consome(ABRE_CHAVE);
+                cmd();
+                consome(FECHA_CHAVE);
+                consome(ENDWHILE);
+                break;
+
+            case GOBACK:
+                consome(GOBACK);
+                break;
+
+            case GETINT:
+                consome(GETINT);
+                consome(ID);
+                break;
+
+            case GETREAL:
+                consome(GETREAL);
+                consome(ID);
+                break;
+
+            case GETCHAR:
+                consome(GETCHAR);
+                consome(ID);
+                break;
+
+            case PUTINT:
+                consome(PUTINT);
+                consome(ID);
+                break;
+
+            case PUTREAL:
+                consome(PUTREAL);
+                consome(ID);
+                break;
+
+            case PUTCHAR:
+                consome(PUTCHAR);
+                consome(ID);
+                break;
+
+            default:
+                printf("Erro: comando inválido.\n");
+        }
+    } else if (t.cat == ID) {
+        atrib();
+    } else {
+        printf("Erro: comando inválido.\n");
+    }
 }
